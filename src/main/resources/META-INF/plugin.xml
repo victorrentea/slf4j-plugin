@@ -1,18 +1,15 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.victorrentea.slf4jplugin</id>
-    <name>slf4j-plugin</name>
+    <name>@Slf4j</name>
     <vendor>victorrentea</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.victorrentea.slf4jplugin.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.victorrentea.slf4jplugin.services.MyProjectService"/>
+        <annotator language="JAVA" implementationClass="com.github.victorrentea.slf4jplugin.Slf4jAnnotator"/>
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.victorrentea.slf4jplugin.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
 </idea-plugin>
