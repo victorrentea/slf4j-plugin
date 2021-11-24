@@ -9,13 +9,16 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 
 
-class RequiredArgsConstructorInspection : LocalInspectionTool() {
+class ReplaceWithRequiredArgsConstructorInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
-        return RequiredArgsConstructorVisitor(holder)
+        return ReplaceWithRequiredArgsConstructorVisitor(holder)
     }
 }
-class RequiredArgsConstructorVisitor(private val holder: ProblemsHolder) : PsiElementVisitor() {
+class ReplaceWithRequiredArgsConstructorVisitor(private val holder: ProblemsHolder) : PsiElementVisitor() {
     override fun visitElement(constructor: PsiElement) {
+        JavaPsiFacade.getInstance(holder.project)
+            .findClass("lombok.RequiredArgsConstructor", constructor.resolveScope) ?: return
+
         if (constructor !is PsiMethod || !constructor.isConstructor)
             return
         val body = constructor.body ?: return
@@ -50,26 +53,27 @@ class RequiredArgsConstructorVisitor(private val holder: ProblemsHolder) : PsiEl
         }
 
         holder.registerProblem(constructor, "Constructor can be replaced with @RequiredArgsConstructor",
-            IntroduceRequiredArgsConstructor(constructor))
+            ReplaceWithRequiredArgsConstructorQuickFix(constructor))
     }
 
     companion object {
-        val log = Logger.getInstance(RequiredArgsConstructorVisitor::class.java)
+        val log = Logger.getInstance(ReplaceWithRequiredArgsConstructorVisitor::class.java)
     }
 }
 
-class IntroduceRequiredArgsConstructor(constructor: PsiMethod) : LocalQuickFixOnPsiElement(constructor) {
+class ReplaceWithRequiredArgsConstructorQuickFix(constructor: PsiMethod) : LocalQuickFixOnPsiElement(constructor) {
     override fun getFamilyName() = "Live-Coding"
 
     override fun getText() = "Replace with @RequiredArgsConstructor (lombok)"
 
     override fun invoke(project: Project, file: PsiFile, constructor: PsiElement, endElement: PsiElement) {
-        constructor.delete()
-
         val parentClass = PsiTreeUtil.getTopmostParentOfType(constructor, PsiClass::class.java) ?: return
         val modifiers = parentClass.modifierList ?: return
         val annotation = modifiers.addAnnotation("lombok.RequiredArgsConstructor")
         JavaCodeStyleManager.getInstance(project).shortenClassReferences(annotation)
+
+        constructor.delete()
     }
 
 }
+

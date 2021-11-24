@@ -16,7 +16,14 @@
                          groupPath="Java,Lombok"
                          enabledByDefault="true"
                          level="WARNING"
-                         implementationClass="com.github.victorrentea.livecoding.lombok.RequiredArgsConstructorInspection"/>
+                         implementationClass="com.github.victorrentea.livecoding.lombok.ReplaceWithRequiredArgsConstructorInspection"/>
+        <localInspection language="JAVA"
+                         displayName="Add @RequiredArgsConstructor to set final fields"
+                         groupName="Redundant definitions"
+                         groupPath="Java,Lombok"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.github.victorrentea.livecoding.lombok.AddRequiredArgsConstructorInspection"/>
     </extensions>
 
 </idea-plugin>
